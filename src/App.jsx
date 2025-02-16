@@ -3,6 +3,8 @@ import Search from './components/Search';
 import Spinner from './components/Spinner';
 import MoviesCard from './components/MoviesCard';
 import { useDebounce } from 'react-use';
+import { getTrandingMovies, updateSearchCount } from './appwrite';
+import Trending from './components/Trending';
 
 const API_BASE_URL='https://api.themoviedb.org/3';
 
@@ -22,6 +24,7 @@ function App() {
   const [errorMessage,setErrorMessage]=useState('');
   const [movies,setMovies]=useState([]);
   const [isLoading,setIsLoading]=useState(false);
+  const [trendingMovies,setTrendingMovies]=useState([]);
   const [debouncedSearchTerm,setDebouncedSearchTerm]=useState('');
 
   useDebounce(() => setDebouncedSearchTerm(searchTerm),500,[searchTerm]);
@@ -50,6 +53,9 @@ function App() {
       }
       
       setMovies(data.results || [] );
+      if (query && data.results.length > 0) {
+        await updateSearchCount(query,data.results[0]);
+      }
 
     } catch (error) {
       console.error(`Error fetching movies: ${error}`);
@@ -60,10 +66,24 @@ function App() {
     }
   };
 
+  const loadTrendingMovies= async() => {
+    try {
+      const movies= await getTrandingMovies();
+      setTrendingMovies(movies);
+    } catch (error) {
+      console.log('Error fetching tranding movies', error);
+      
+    }
+  }
+
   useEffect( () => {
     fetchMovies(debouncedSearchTerm);
 
   }, [debouncedSearchTerm]);
+
+  useEffect( () => {
+    loadTrendingMovies()
+  },[]);
 
   return(
    <main>
@@ -75,9 +95,13 @@ function App() {
             Enjoy Without the Hassle</h1>
             <Search searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
           </header>
+
+          {trendingMovies.length>0 && (
+            <Trending trendingMovies={trendingMovies}/>
+          ) }
           
           <section className="all-movies">
-            <h2 className='mt-[40px]'>All Movies</h2>
+            <h2 >All Movies</h2>
 
             { isLoading ? (
               <Spinner />
