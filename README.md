@@ -44,9 +44,9 @@ Set Up Environment Variables
  -VITE_TMDB_API_KEY=<your_tmdb_api_key>
 
 Run the Development Server
-
+```
 Deployment
- -To deploy your app, you can use platforms like Vercel or Netlify.
+  -To deploy your app, you can use platforms like Vercel or Netlify.
 
 License
- -This project is licensed under the MIT License - see the LICENSE file for details.
+  -This project is licensed under the MIT License - see the LICENSE file for details.
